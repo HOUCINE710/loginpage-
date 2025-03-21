@@ -1,5 +1,5 @@
-import PromoSection from "./PromoSection"; // استيراد المكون الجديد
-import SignupForm from "./SignupForm";
+import PromoSection1 from "./PromoSection1"; // استيراد المكون الجديد
+import LoginForm from "./LoginForm";
 
 const Container = () => {
   return (
@@ -7,12 +7,14 @@ const Container = () => {
 
         
       {/* نموذج التسجيل */}
-      <div className="w-full max-w-lg">
-        <SignupForm />
+      <div >
+      <PromoSection1 />
       </div>
       {/* القسم الترويجي */}
-      <PromoSection />
-
+      <div className="w-full max-w-lg">
+      <LoginForm />
+      </div>
+    
     </div>
   );
 };

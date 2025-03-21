@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
 const SignupForm = () => {
-  const navigate = useNavigate(); // ملاحظة: يجب استخدام هذا داخل `function`
-
+ 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -14,6 +11,16 @@ const SignupForm = () => {
     confirmPassword: "",
     termsAccepted: false,
   });
+  const [errors, setErrors] = useState({});
+
+  const errorMessages = {
+    firstName: "Name is required.",
+    lastName: "Name is required.",
+    email: "Email is required.",
+    phone: "Phone number is required.",
+    password: "Password is required.",
+    confirmPassword: "Please confirm your password.",
+  };
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -21,6 +28,14 @@ const SignupForm = () => {
       ...formData,
       [id]: type === "checkbox" ? checked : value,
     });
+  };
+
+  const handleBlur = (e) => {
+    const { id, value } = e.target;
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: value.trim() === "" ? errorMessages[id] : "",
+    }));
   };
 
   const isFormValid =
@@ -32,99 +47,144 @@ const SignupForm = () => {
     formData.confirmPassword &&
     formData.password === formData.confirmPassword &&
     formData.termsAccepted;
-
+   
   return (
-    <div className="relative bg-white shadow-lg rounded-2xl flex flex-col overflow-hidden p-8">
-      <h2 className="text-2xl font-bold text-indigo-800 text-center">Create Account 🎉</h2>
-      <p className="text-indigo-600 mt-2 text-center">Join the largest digital store in Algeria</p>
+    <div className="relative bg-white shadow-lg rounded-2xl flex flex-col overflow-hidden">
+      <div  className="p-8" >
+      <h2 className="text-2xl font-bold text-indigo-800 text-center">
+        Create Account 🎉
+      </h2>
+      <p className="text-indigo-600 mt-2 text-center">
+        Join the largest digital store in Algeria
+      </p>
 
       <form className="space-y-6 mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative w-full">
-            <span className="absolute left-3 top-3 text-lg opacity-70">👤</span>
-            <input className="w-full pl-10 p-3 border rounded-lg" id="firstName" type="text" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
-          </div>
-          <div className="relative w-full">
-            <span className="absolute left-3 top-3 text-lg opacity-70">👤</span>
-            <input className="w-full pl-10 p-3 border rounded-lg" id="lastName" type="text" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
-          </div>
+          {[
+            { id: "firstName", placeholder: "First Name", icon: "👤" },
+            { id: "lastName", placeholder: "Last Name", icon: "👤" },
+          ].map(({ id, placeholder, icon }) => (
+            <div key={id} className="relative w-full">
+              <span className="absolute left-3 top-3 text-lg opacity-70">
+                {icon}
+              </span>
+              <input
+                className={`w-full pl-10 p-3 border rounded-lg outline-none transition-all duration-300 ${
+                  errors[id]
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+                }`}
+                id={id}
+                type="text"
+                placeholder={placeholder}
+                value={formData[id]}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              {errors[id] && (
+                <p className="text-red-500 text-sm mt-1">{errors[id]}</p>
+              )}
+            </div>
+          ))}
         </div>
 
-        <div className="relative w-full">
-          <span className="absolute left-3 top-3 text-lg opacity-70">📧</span>
-          <input className="w-full pl-10 p-3 border rounded-lg" id="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-        </div>
-
-        <div className="relative w-full">
-          <span className="absolute left-3 top-3 text-lg opacity-70">📱</span>
-          <input className="w-full pl-10 p-3 border rounded-lg" id="phone" type="tel" placeholder="+213 _ __ __ __ __" value={formData.phone} onChange={handleChange} />
-        </div>
-
-        <div className="relative w-full">
-          <span className="absolute left-3 top-3 text-lg opacity-70">🔒</span>
-          <input className="w-full pl-10 p-3 border rounded-lg" id="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} />
-        </div>
-
-        <div className="relative w-full">
-          <span className="absolute left-3 top-3 text-lg opacity-70">🔒</span>
-          <input className="w-full pl-10 p-3 border rounded-lg" id="confirmPassword" type="password" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <input type="checkbox" id="termsAccepted" className="peer hidden" checked={formData.termsAccepted} onChange={handleChange} />
-            <label htmlFor="termsAccepted" className="w-6 h-6 border-2 border-gray-400 rounded-md cursor-pointer flex items-center justify-center transition-all duration-200 peer-checked:bg-[rgb(90,71,251)] peer-checked:border-transparent">
-              <svg className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12l5 5L20 7" />
-              </svg>
-            </label>
-            <span className="text-sm text-gray-600">
-              I have read and agree to <button type="button" className="font-medium text-[rgb(90,71,251)] hover:opacity-80 transition-opacity">terms and conditions</button>
+        {[
+          { id: "email", type: "text", placeholder: "Email", icon: "📧" },
+          { id: "phone", type: "text", placeholder: "Phone", icon: "📱" },
+          { id: "password", type: "password", placeholder: "Password", icon: "🔒" },
+          { id: "confirmPassword", type: "password", placeholder: "Confirm Password", icon: "🔒" },
+        ].map(({ id, type, placeholder, icon }) => (
+          <div key={id} className="relative w-full">
+            <span className="absolute left-3 top-3 text-lg opacity-70">
+              {icon}
             </span>
+            <input
+              className={`w-full pl-10 p-3 border rounded-lg outline-none transition-all duration-300 ${
+                errors[id]
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
+              }`}
+              id={id}
+              type={type}
+              placeholder={placeholder}
+              value={formData[id]}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            {errors[id] && (
+              <p className="text-red-500 text-sm mt-1">{errors[id]}</p>
+            )}
           </div>
+        ))}
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="termsAccepted"
+            className="peer hidden"
+            checked={formData.termsAccepted}
+            onChange={handleChange}
+          />
+          <label
+            htmlFor="termsAccepted"
+            className="relative w-6 h-6 border-2 border-gray-400 rounded-md cursor-pointer flex items-center justify-center transition-all duration-200 peer-checked:bg-indigo-600 peer-checked:border-transparent"
+          >
+            <svg
+              className="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12l5 5L20 7" />
+            </svg>
+          </label>
+          <span className="text-sm text-gray-600">
+            I have read and agree to{" "}
+            <button
+              type="button"
+              className="font-medium text-indigo-600 hover:opacity-80"
+            >
+              terms and conditions
+            </button>
+          </span>
         </div>
 
-        {/* إضافة الخطين مع "or" في الوسط */}
-        <div className="relative flex items-center justify-center my-4">
+        <button
+          type="submit"
+          disabled={!isFormValid}
+          className={`w-full p-3 text-white font-medium rounded-lg transition-all ${
+            isFormValid
+              ? "bg-indigo-600 hover:bg-indigo-700"
+              : "bg-indigo-400 cursor-not-allowed"
+          }`}
+        >
+          Create Account
+        </button>
+       {/* خط مع "or" */}
+       <div className="flex items-center justify-center my-4">
           <div className="flex-grow border-t border-gray-300"></div>
-          <span className="px-2 bg-white text-gray-500">or</span>
+          <span className="mx-3 text-gray-500">or</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
-
-       
-{/* زر إنشاء الحساب */}
-<button
-  type="submit"
-  disabled={!isFormValid}
-  className={`w-full p-3 text-white font-medium rounded-lg transition-all ${
-    isFormValid ? "bg-indigo-600 hover:bg-indigo-700" : "cursor-not-allowed"
-  }`}
-  style={!isFormValid ? { backgroundColor: "rgb(90 71 251 / 69%)" } : {}}
->
-  Create Account
-</button>
-
-{/* زر تسجيل الدخول بواسطة Google */}
-<button
-  type="button"
-  className="w-full border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 text-gray-700 font-medium hover:bg-gray-100 transition-all cursor-pointer"
->
-  <span className="q-btn__content text-center col items-center q-anchor--skip justify-center row">
-    <i className="q-icon on-left fa-brands fa-google" aria-hidden="true" role="img"></i>
-    <span className="block">Sign up with Google</span>
-  </span>
-</button>
-
-{/* زر تسجيل الدخول إذا كان لديك حساب مسبقًا */}
-<button
-      onClick={() => navigate("/login")}
-      className="w-full block text-center bg-indigo-600 text-white font-bold text-lg py-4 hover:bg-indigo-700 transition-all duration-300"
-    >
-      Already have an account? <Link to="/login" className="font-bold">Login 🔑</Link>
-    </button>
-
-      </form>
+   
+        {/* زر تسجيل الدخول بجوجل */}
+        <button className="w-full flex items-center justify-center gap-2 p-3 border-2 border-gray-300 rounded-lg transition-all hover:bg-gray-100">
+          <i className="fa-brands fa-google text-red-500"></i>
+          <span className="text-gray-700 font-medium">Sign up with Google</span>
+        </button>
+     
       
+      </form>
+      </div>
+      <button
+         
+         className="w-full block text-center bg-indigo-600 font-bold text-lg py-4 transition-all duration-300"
+       >
+        <Link to="/login" className=" font-bold text-white"> Already have an account?{" "}Login 🔑 </Link>
+       </button>
     </div>
   );
 };
